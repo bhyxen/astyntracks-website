@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useMemo, useState } from "react";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Group, Object3D, Mesh, Quaternion, Vector3 } from "three";
 import { useInView, useScroll, useTransform } from "framer-motion";
@@ -29,37 +29,38 @@ export default function LogoModel({
 	// Load the 3D model
 	const { scene } = useGLTF("/assets/3d/a-3d-w-compressed.glb");
 	const modelRef = useRef<Group>(null);
+	// Create a ref for an HTML element for in-view detection.
 	const inViewRef = useRef<HTMLDivElement>(null);
 	const isInView = useInView(inViewRef);
 
-	// State to hold the current scale
+	// State for current scale
 	const [currentScale, setCurrentScale] = useState<number>(
 		typeof scale === "number" ? scale : 0.2,
 	);
 
-	const screenWidth = window.innerWidth;
-	const mobileBreakpoint = 768; // Define the breakpoint for mobile devices
-	const desktopScale = 0.2; // Scale for desktop devices
-	const mobileScale = 0.13; // Scale for mobile devices
+	const mobileBreakpoint = 768;
+	const desktopScale = 0.2;
+	const mobileScale = 0.13;
 
-	// Set initial scale and add event listener for window resize
 	useEffect(() => {
 		const updateScale = () => {
 			setCurrentScale(
-				screenWidth < mobileBreakpoint ? mobileScale : desktopScale,
+				window.innerWidth < mobileBreakpoint
+					? mobileScale
+					: desktopScale,
 			);
 		};
 		updateScale();
 		window.addEventListener("resize", updateScale);
 		return () => window.removeEventListener("resize", updateScale);
-	}, [screenWidth]);
+	}, []);
 
-	// Get scroll progress from framer-motion and interpolate from 0.2 to 1
+	// Get scroll progress and interpolate scale from 0.2 to 1
 	const { scrollYProgress } = useScroll();
 	const interpolatedScale = useTransform(
 		scrollYProgress,
 		[0, 1],
-		[screenWidth < mobileBreakpoint ? mobileScale : desktopScale, 1],
+		[window.innerWidth < mobileBreakpoint ? mobileScale : desktopScale, 1],
 	);
 
 	// Refs for rotation and glitch effect
@@ -124,7 +125,6 @@ export default function LogoModel({
 			Math.random() * (glitchInterval[1] - glitchInterval[0]) +
 			glitchInterval[0];
 		const glitchTimer = setInterval(triggerGlitch, intervalTime);
-
 		return () => clearInterval(glitchTimer);
 	}, [isInView, glitchProbability, glitchDuration, glitchInterval]);
 
@@ -154,10 +154,17 @@ export default function LogoModel({
 	});
 
 	return (
-		<div ref={inViewRef}>
+		<>
+			{/* An HTML element for in-view detection */}
+			<Html
+				as="div"
+				ref={inViewRef}
+				style={{ width: "100%", height: "100%" }}
+			/>
+			{/* Your Three.js scene */}
 			<group position={[0, 0, -5]} {...props}>
 				<group ref={modelRef} />
 			</group>
-		</div>
+		</>
 	);
 }
