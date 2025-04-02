@@ -3,7 +3,7 @@
 import { useRef, useEffect, useMemo, useState } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Group, Quaternion, Vector3, THREE } from "three";
+import { Group, Object3D, Mesh, Quaternion, Vector3 } from "three";
 import { useInView, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 
@@ -29,7 +29,7 @@ export default function LogoModel({
 	// Load the 3D model
 	const { scene } = useGLTF("/assets/3d/a-3d-w-compressed.glb");
 	const modelRef = useRef<Group>(null);
-	const inViewRef = useRef(null);
+	const inViewRef = useRef<HTMLDivElement>(null);
 	const isInView = useInView(inViewRef);
 
 	// State to hold the current scale
@@ -44,7 +44,6 @@ export default function LogoModel({
 
 	// Set initial scale and add event listener for window resize
 	useEffect(() => {
-		// Function to update scale based on screen width
 		const updateScale = () => {
 			setCurrentScale(
 				screenWidth < mobileBreakpoint ? mobileScale : desktopScale,
@@ -83,10 +82,14 @@ export default function LogoModel({
 	// Memoize the cloned and processed scene so it only runs once per model load
 	const clonedScene = useMemo(() => {
 		const clone = scene.clone();
-		clone.traverse((child: THREE.Object3D) => {
-			if (child.isMesh) {
-				if (child.geometry?.center) child.geometry.center();
-				if (child.material) child.material.color.set("#FFFFFF");
+		clone.traverse((child) => {
+			if (child instanceof Mesh) {
+				// Center the geometry if the method exists
+				child.geometry.center();
+				// Update material color if it supports color
+				if ("color" in child.material) {
+					child.material.color.set("#FFFFFF");
+				}
 				child.frustumCulled = true;
 			}
 		});
@@ -96,14 +99,14 @@ export default function LogoModel({
 	// Add the cloned scene to our modelRef on mount
 	useEffect(() => {
 		if (modelRef.current && clonedScene) {
-			modelRef.current.add(clonedScene);
+			// Explicitly cast clonedScene as Object3D to fix the type error.
+			modelRef.current.add(clonedScene as unknown as Object3D);
 		}
 	}, [clonedScene]);
 
 	// Setup glitch effect separately
 	useEffect(() => {
 		const triggerGlitch = () => {
-			// Use current inView state
 			if (!isInView || Math.random() > glitchProbability) return;
 			glitchActive.current = true;
 			glitchScaleFactor.current = 1 + (Math.random() * 0.2 - 0.1);
@@ -129,13 +132,11 @@ export default function LogoModel({
 	useFrame(() => {
 		if (!modelRef.current) return;
 
-		// Update rotation only when in view
 		if (isInView) {
 			rotation.current.x += rotationSpeed.x;
 			rotation.current.y += rotationSpeed.y;
 			rotation.current.z += rotationSpeed.z;
 
-			// Apply rotations using quaternions
 			modelRef.current.quaternion.setFromAxisAngle(
 				yAxis,
 				rotation.current.y,
@@ -146,7 +147,6 @@ export default function LogoModel({
 			modelRef.current.quaternion.multiply(tempQuaternion.current);
 		}
 
-		// Compute and apply current scale (including any glitch effect)
 		const scaleValue =
 			currentScale *
 			(glitchActive.current ? glitchScaleFactor.current : 1);
@@ -154,8 +154,10 @@ export default function LogoModel({
 	});
 
 	return (
-		<group position={[0, 0, -5]} {...props} ref={inViewRef}>
-			<group ref={modelRef} />
-		</group>
+		<div ref={inViewRef}>
+			<group position={[0, 0, -5]} {...props}>
+				<group ref={modelRef} />
+			</group>
+		</div>
 	);
 }

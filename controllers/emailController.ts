@@ -13,7 +13,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendMessage = async ({ name, email, message }: emailDetails) => {
 	try {
 		resend.emails.send({
-			from: process.env.EMAIL_FROM,
+			from: process.env.EMAIL_FROM as string,
 			to: "astyntracks@gmail.com",
 			subject: "NEW MESSAGE FROM WEBSITE (https://www.astyntracks.com)",
 			html: htmlEmailTemplate({
