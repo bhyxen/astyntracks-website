@@ -14,44 +14,49 @@ export default function Hero() {
 	const [glitchActive, setGlitchActive] = useState(false);
 	const [glitchIntensity, setGlitchIntensity] = useState(1);
 
+	const [glitchText, setGlitchText] = useState<string>();
+
+	// Update text with random characters periodically for the glitch effect
+	useEffect(() => {
+		const characters =
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{};:'\",.<>/?|\\`~";
+		const interval = setInterval(() => {
+			let newText = "";
+			for (let i = 0; i < 15; i++) {
+				newText += characters.charAt(
+					Math.floor(Math.random() * characters.length),
+				);
+			}
+			setGlitchText(newText);
+		}, 100); // Adjust speed as desired
+		return () => clearInterval(interval);
+	}, []);
+
 	// Track scroll progress for scaling effect
 	const { scrollYProgress } = useScroll();
 	const textScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.5]);
 	const logoScale = useTransform(scrollYProgress, [0, 0.2], [1.5, 2.5]);
 
-	// More aggressive glitch effect for text
+	// More aggressive glitch effect for text styling
 	const applyGlitchEffect = useCallback(() => {
 		if (titleRef.current) {
-			// Apply more intense glitch effect
 			const intensity = glitchIntensity * 2;
 			titleRef.current.style.textShadow = `
-        ${Math.random() * intensity - intensity / 2}px ${
-			Math.random() * intensity - intensity / 2
-		}px rgba(255, 230, 0, 0.7),
-        ${Math.random() * -intensity + intensity / 2}px ${
-			Math.random() * -intensity + intensity / 2
-		}px rgba(255, 255, 255, 0.5),
-        ${Math.random() * intensity - intensity / 2}px ${
-			Math.random() * intensity - intensity / 2
-		}px rgba(0, 255, 255, 0.3)
+        ${Math.random() * intensity - intensity / 2}px ${Math.random() * intensity - intensity / 2}px rgba(255, 230, 0, 0.7),
+        ${Math.random() * -intensity + intensity / 2}px ${Math.random() * -intensity + intensity / 2}px rgba(255, 255, 255, 0.5),
+        ${Math.random() * intensity - intensity / 2}px ${Math.random() * intensity - intensity / 2}px rgba(0, 255, 255, 0.3)
       `;
-			titleRef.current.style.transform = `translate(${
-				Math.random() * intensity - intensity / 2
-			}px, ${Math.random() * intensity - intensity / 2}px) skew(${
-				Math.random() * intensity - intensity / 2
-			}deg)`;
+			titleRef.current.style.transform = `translate(${Math.random() * intensity - intensity / 2}px, ${Math.random() * intensity - intensity / 2}px) skew(${Math.random() * intensity - intensity / 2}deg)`;
 
 			if (Math.random() > 0.7) {
-				titleRef.current.style.clipPath = `inset(${Math.random() * 10}% 0 ${
-					Math.random() * 5
-				}% 0)`;
+				titleRef.current.style.clipPath = `inset(${Math.random() * 10}% 0 ${Math.random() * 5}% 0)`;
 			} else {
 				titleRef.current.style.clipPath = "none";
 			}
 		}
 	}, [glitchIntensity]);
 
-	// Reset glitch effect
+	// Reset glitch effect styling
 	const resetGlitchEffect = useCallback(() => {
 		if (titleRef.current) {
 			titleRef.current.style.textShadow = "";
@@ -60,7 +65,7 @@ export default function Hero() {
 		}
 	}, []);
 
-	// Glitch effect for text
+	// Glitch effect timing for text styling
 	useEffect(() => {
 		let timeout: NodeJS.Timeout;
 		let glitchTimeout: NodeJS.Timeout;
@@ -86,7 +91,6 @@ export default function Hero() {
 					glitchTimeout = setTimeout(
 						() => {
 							glitchEffect();
-
 							if (Math.random() > 0.5) {
 								setTimeout(
 									glitchEffect,
@@ -112,8 +116,7 @@ export default function Hero() {
 	}, [applyGlitchEffect, resetGlitchEffect]);
 
 	const screenWidth = window.innerWidth;
-	const mobileBreakpoint = 768; // Define the breakpoint for mobile devices
-
+	const mobileBreakpoint = 768;
 	const modelPosition =
 		screenWidth < mobileBreakpoint ? [0, 0.7, 0] : [0, 0.7, 0];
 
@@ -130,12 +133,12 @@ export default function Hero() {
 				className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay"
 				style={{
 					backgroundImage:
-						"url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiMwMDAiLz48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsdGVyPSJ1cmwoI24pIiBvcGFjaXR5PSIwLjQiLz48L3N2Zz4=')",
+						"url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+<br/><rect width='200' height='200' fill='#000' /><rect width='200' height='200' fill='#000' opacity='0.4'/></svg>')",
 					backgroundSize: "100px",
 				}}
 			></div>
 
-			{/* Concrete texture */}
+			{/* Concrete texture overlay */}
 			<div
 				className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay"
 				style={{
@@ -221,7 +224,7 @@ export default function Hero() {
 				</svg>
 			</div>
 
-			{/* 3D Logo Canvas - Pass logoScale to LogoModel */}
+			{/* 3D Logo Canvas */}
 			<Canvas className="absolute inset-0">
 				<Suspense fallback={null}>
 					<LogoModel position={modelPosition} scale={logoScale} />
@@ -254,11 +257,11 @@ export default function Hero() {
 			{/* Overlay content */}
 			<div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none">
 				<motion.div
-					className="text-center mt-56" // Add margin-top to move the text down
+					className="text-center mt-56"
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.8 }}
-					style={{ scale: textScale }} // Apply scale based on scroll
+					style={{ scale: textScale }}
 				>
 					<div className="mt-4 flex justify-center">
 						<motion.div
@@ -269,12 +272,13 @@ export default function Hero() {
 						/>
 					</div>
 					<motion.p
+						ref={titleRef}
 						className="text-xl md:text-2xl mt-6 text-white tracking-widest uppercase"
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						transition={{ duration: 0.5, delay: 0.7 }}
 					>
-						Turn It Up. Blow It Out
+						Stellar Tracks
 					</motion.p>
 
 					<motion.div
@@ -283,7 +287,7 @@ export default function Hero() {
 						animate={{ opacity: 1 }}
 						transition={{ duration: 0.5, delay: 0.9 }}
 					>
-						91°00&apos;00.0&quot;N 181°00&apos;00.0&quot;W
+						{glitchText}
 					</motion.div>
 				</motion.div>
 
@@ -306,7 +310,7 @@ export default function Hero() {
 				</motion.div>
 			</div>
 
-			{/* Static/glitch lines - more of them and more dynamic */}
+			{/* Static/glitch lines */}
 			<div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10">
 				{Array.from({ length: 15 }).map((_, i) => (
 					<motion.div
@@ -340,7 +344,7 @@ export default function Hero() {
 			{/* Horizontal line */}
 			<div className="absolute bottom-0 left-0 right-0 h-[1px] bg-yellow-400/30"></div>
 
-			{/* VHS tracking lines - more intense */}
+			{/* VHS tracking lines */}
 			<div className="absolute inset-0 pointer-events-none overflow-hidden mix-blend-overlay opacity-5">
 				<motion.div
 					className="absolute inset-0"
