@@ -74,7 +74,7 @@ export default function LogoModel({
 
 	// Subscribe to the interpolated scale so it updates smoothly on scroll.
 	useEffect(() => {
-		const unsubscribe = interpolatedScale.onChange((latest) => {
+		const unsubscribe = interpolatedScale.on("change", (latest) => {
 			setCurrentScale(latest);
 		});
 		return () => unsubscribe();
