@@ -7,6 +7,7 @@ import LogoModel from "./logo-model";
 import { ArrowDown } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import CustomButton from "./customButton";
+import * as THREE from "three";
 
 export default function Hero() {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -126,11 +127,11 @@ export default function Hero() {
 			className="relative h-screen w-full overflow-hidden bg-black"
 		>
 			{/* Noise texture overlay */}
-			<div className="absolute inset-0 opacity-20 pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=')]"></div>
+			<div className="absolute inset-0 opacity-20 md:pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=')]"></div>
 
 			{/* Digital distortion overlay */}
 			<div
-				className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay"
+				className="absolute inset-0 opacity-10 md:pointer-events-none mix-blend-overlay"
 				style={{
 					backgroundImage:
 						"url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC45IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+<br/><rect width='200' height='200' fill='#000' /><rect width='200' height='200' fill='#000' opacity='0.4'/></svg>')",
@@ -140,7 +141,7 @@ export default function Hero() {
 
 			{/* Concrete texture overlay */}
 			<div
-				className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay"
+				className="absolute inset-0 opacity-10 md:pointer-events-none mix-blend-overlay"
 				style={{
 					backgroundImage:
 						"url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDAiIGhlaWdodD0iNTAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjA1IiBudW1PY3RhdmVzPSI1IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1IiBkPSJNMCAwaDUwMHY1MDBIMHoiLz48L3N2Zz4=')",
@@ -228,19 +229,23 @@ export default function Hero() {
 			<Canvas className="absolute inset-0">
 				<Suspense fallback={null}>
 					<LogoModel position={modelPosition} scale={logoScale} />
-					<Sparkles
-						count={50}
-						scale={10}
-						size={1.5}
-						speed={0.3}
-						color="#FFE600"
-					/>
 					<OrbitControls
 						enableZoom={false}
 						autoRotate
 						autoRotateSpeed={0.5}
 						maxPolarAngle={Math.PI / 2}
 						minPolarAngle={Math.PI / 4}
+						mouseButtons={{
+							RIGHT: undefined,
+							LEFT: THREE.MOUSE.ROTATE,
+						}}
+					/>
+					<Sparkles
+						count={50}
+						scale={10}
+						size={1.5}
+						speed={0.3}
+						color="#FFE600"
 					/>
 					<Environment preset="night" />
 					<ambientLight intensity={0.3} />
@@ -255,7 +260,7 @@ export default function Hero() {
 			</Canvas>
 
 			{/* Overlay content */}
-			<div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none">
+			<div className="absolute inset-0 flex flex-col items-center justify-center z-10 md:pointer-events-none">
 				<motion.div
 					className="text-center mt-56"
 					initial={{ opacity: 0, y: 20 }}
@@ -311,7 +316,7 @@ export default function Hero() {
 			</div>
 
 			{/* Static/glitch lines */}
-			<div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10">
+			<div className="absolute inset-0 md:pointer-events-none overflow-hidden opacity-10">
 				{Array.from({ length: 15 }).map((_, i) => (
 					<motion.div
 						key={i}
@@ -345,7 +350,7 @@ export default function Hero() {
 			<div className="absolute bottom-0 left-0 right-0 h-[1px] bg-yellow-400/30"></div>
 
 			{/* VHS tracking lines */}
-			<div className="absolute inset-0 pointer-events-none overflow-hidden mix-blend-overlay opacity-5">
+			<div className="absolute inset-0 md:pointer-events-none overflow-hidden mix-blend-overlay opacity-5">
 				<motion.div
 					className="absolute inset-0"
 					style={{
@@ -366,7 +371,7 @@ export default function Hero() {
 			</div>
 
 			{/* Data corruption effect */}
-			<div className="absolute inset-0 pointer-events-none">
+			<div className="absolute inset-0 md:pointer-events-none">
 				{Array.from({ length: 3 }).map((_, i) => (
 					<motion.div
 						key={`data-corruption-${i}`}

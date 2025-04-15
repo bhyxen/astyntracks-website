@@ -1,61 +1,37 @@
 "use client";
 
-import { useRef, useEffect, useMemo, useState } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import { useGLTF, Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Group, Object3D, Mesh, Quaternion, Vector3 } from "three";
-import { useInView, useScroll, useTransform } from "framer-motion";
+import { Group, Object3D, Mesh, DoubleSide, MeshStandardMaterial } from "three";
+import { useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
+import debounce from "debounce";
 
 // Preload the model
 useGLTF.preload("/assets/3d/a-3d-w-compressed.glb");
 
 export default function LogoModel({
-	// Default base scale (we use the scroll interpolation to drive it)
 	scale = 0.2,
-	rotationSpeed = { x: 0.005, y: 0.01, z: 0.003 },
-	glitchProbability = 0.3,
-	glitchInterval = [2000, 5000],
-	glitchDuration = [100, 400],
+	rotationSpeed = 0.1,
 	...props
 }: {
 	scale?: MotionValue<number> | number;
-	rotationSpeed?: { x: number; y: number; z: number };
-	glitchProbability?: number;
-	glitchInterval?: [number, number];
-	glitchDuration?: [number, number];
+	rotationSpeed?: number;
 	[key: string]: unknown;
 }) {
-	// Load the 3D model
 	const { scene } = useGLTF("/assets/3d/a-3d-w-compressed.glb");
 	const modelRef = useRef<Group>(null);
-	// Create a ref for an HTML element for in-view detection.
 	const inViewRef = useRef<HTMLDivElement>(null);
-	const isInView = useInView(inViewRef);
-
-	// State for current scale
-	const [currentScale, setCurrentScale] = useState<number>(
-		typeof scale === "number" ? scale : 0.2,
-	);
 
 	const mobileBreakpoint = 768;
 	const desktopScale = 0.2;
 	const mobileScale = 0.13;
 
-	useEffect(() => {
-		const updateScale = () => {
-			setCurrentScale(
-				window.innerWidth < mobileBreakpoint
-					? mobileScale
-					: desktopScale,
-			);
-		};
-		updateScale();
-		window.addEventListener("resize", updateScale);
-		return () => window.removeEventListener("resize", updateScale);
-	}, []);
+	// Memoize rotation speed to avoid unnecessary re-renders
+	const memoizedRotationSpeed = useMemo(() => rotationSpeed, [rotationSpeed]);
 
-	// Get scroll progress and interpolate scale from 0.2 to 1
+	// Calculate interpolated scale based on scroll progress
 	const { scrollYProgress } = useScroll();
 	const interpolatedScale = useTransform(
 		scrollYProgress,
@@ -63,106 +39,88 @@ export default function LogoModel({
 		[window.innerWidth < mobileBreakpoint ? mobileScale : desktopScale, 1],
 	);
 
-	// Refs for rotation and glitch effect
-	const tempQuaternion = useRef(new Quaternion());
-	const rotation = useRef({ x: 0, y: 0, z: 0 });
-	const xAxis = new Vector3(1, 0, 0);
-	const yAxis = new Vector3(0, 1, 0);
-	const zAxis = new Vector3(0, 0, 1);
-	const glitchActive = useRef(false);
-	const glitchScaleFactor = useRef(1);
-
-	// Subscribe to the interpolated scale so it updates smoothly on scroll.
-	useEffect(() => {
-		const unsubscribe = interpolatedScale.on("change", (latest) => {
-			setCurrentScale(latest);
-		});
-		return () => unsubscribe();
-	}, [interpolatedScale]);
-
-	// Memoize the cloned and processed scene so it only runs once per model load
+	// Clone the scene and center geometries
 	const clonedScene = useMemo(() => {
 		const clone = scene.clone();
 		clone.traverse((child) => {
 			if (child instanceof Mesh) {
-				// Center the geometry if the method exists
 				child.geometry.center();
-				// Update material color if it supports color
-				if ("color" in child.material) {
-					child.material.color.set("#FFFFFF");
-				}
-				child.frustumCulled = true;
+				child.geometry.computeVertexNormals(); // Ensure normals are computed
+				child.material = new MeshStandardMaterial({
+					color: child.material.color || 0xffffff,
+					metalness: 0.5, // Adjust for reflectivity
+					roughness: 0.5, // Adjust for surface roughness
+					side: DoubleSide, // Enable double-sided rendering
+				});
 			}
 		});
 		return clone;
 	}, [scene]);
 
-	// Add the cloned scene to our modelRef on mount
+	// Add cloned scene to the model reference
 	useEffect(() => {
 		if (modelRef.current && clonedScene) {
-			// Explicitly cast clonedScene as Object3D to fix the type error.
 			modelRef.current.add(clonedScene as unknown as Object3D);
 		}
+		return () => {
+			// Clean up cloned scene to avoid memory leaks
+			if (modelRef.current && clonedScene) {
+				modelRef.current.remove(clonedScene as unknown as Object3D);
+			}
+		};
 	}, [clonedScene]);
 
-	// Setup glitch effect separately
+	// Update scale dynamically on window resize
 	useEffect(() => {
-		const triggerGlitch = () => {
-			if (!isInView || Math.random() > glitchProbability) return;
-			glitchActive.current = true;
-			glitchScaleFactor.current = 1 + (Math.random() * 0.2 - 0.1);
-			setTimeout(
-				() => {
-					glitchActive.current = false;
-					glitchScaleFactor.current = 1;
-				},
-				Math.random() * (glitchDuration[1] - glitchDuration[0]) +
-					glitchDuration[0],
-			);
-		};
+		const updateScale = debounce(() => {
+			const scaleValue =
+				window.innerWidth < mobileBreakpoint
+					? mobileScale
+					: desktopScale;
+			modelRef.current?.scale.set(scaleValue, scaleValue, scaleValue);
+		}, 200);
 
-		const intervalTime =
-			Math.random() * (glitchInterval[1] - glitchInterval[0]) +
-			glitchInterval[0];
-		const glitchTimer = setInterval(triggerGlitch, intervalTime);
-		return () => clearInterval(glitchTimer);
-	}, [isInView, glitchProbability, glitchDuration, glitchInterval]);
+		updateScale();
+		window.addEventListener("resize", updateScale);
+		return () => window.removeEventListener("resize", updateScale);
+	}, []);
 
-	// Apply rotation and scale in the animation loop
-	useFrame(() => {
+	// Apply rotation and scaling in the animation frame
+	useFrame((_, delta) => {
 		if (!modelRef.current) return;
 
-		if (isInView) {
-			rotation.current.x += rotationSpeed.x;
-			rotation.current.y += rotationSpeed.y;
-			rotation.current.z += rotationSpeed.z;
+		// Apply continuous rotation scaled by delta
+		modelRef.current.rotation.y += memoizedRotationSpeed * delta;
 
-			modelRef.current.quaternion.setFromAxisAngle(
-				yAxis,
-				rotation.current.y,
-			);
-			tempQuaternion.current.setFromAxisAngle(xAxis, rotation.current.x);
-			modelRef.current.quaternion.multiply(tempQuaternion.current);
-			tempQuaternion.current.setFromAxisAngle(zAxis, rotation.current.z);
-			modelRef.current.quaternion.multiply(tempQuaternion.current);
-		}
-
+		// Apply interpolated scaling
 		const scaleValue =
-			currentScale *
-			(glitchActive.current ? glitchScaleFactor.current : 1);
+			typeof scale === "number" ? scale : interpolatedScale.get();
 		modelRef.current.scale.set(scaleValue, scaleValue, scaleValue);
 	});
 
 	return (
 		<>
-			{/* An HTML element for in-view detection */}
 			<Html
 				as="div"
 				ref={inViewRef}
 				style={{ width: "100%", height: "100%" }}
 			/>
-			{/* Your Three.js scene */}
 			<group position={[0, 0, -5]} {...props}>
+				{/* Add ambient light for increased brightness */}
+				<ambientLight intensity={1} color="#ffffff" castShadow />
+				{/* Add directional light for focused lighting */}
+				<directionalLight
+					intensity={0.3}
+					color="#ffffff"
+					position={[5, 0, 5]} // Adjust position as needed
+					castShadow
+				/>
+				<pointLight
+					intensity={0.3}
+					color="#ffffff"
+					position={[0, 5, 0]} // Position above the model
+					castShadow
+				/>
 				<group ref={modelRef} />
 			</group>
 		</>
