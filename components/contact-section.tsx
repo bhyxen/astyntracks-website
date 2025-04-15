@@ -142,10 +142,10 @@ export default function ContactSection() {
 											GENERAL
 										</h4>
 										<a
-											href="mailto:contact@astyntracks.com"
+											href="mailto:contact@electricbombay.com"
 											className="text-gray-300 hover:text-yellow-400 transition-colors"
 										>
-											contact@astyntracks.com
+											contact@electricbombay.com
 										</a>
 									</div>
 								</div>
@@ -157,10 +157,10 @@ export default function ContactSection() {
 											BOOKINGS
 										</h4>
 										<a
-											href="mailto:bookings@astyntracks.com"
+											href="mailto:bookings@electricbombay.com"
 											className="text-gray-300 hover:text-yellow-400 transition-colors"
 										>
-											bookings@astyntracks.com
+											bookings@electricbombay.com
 										</a>
 									</div>
 								</div>
@@ -172,10 +172,10 @@ export default function ContactSection() {
 											MANAGEMENT
 										</h4>
 										<a
-											href="mailto:mgmt@astyntracks.com"
+											href="mailto:management@electricbombay.com"
 											className="text-gray-300 hover:text-yellow-400 transition-colors"
 										>
-											mgmt@astyntracks.com
+											management@electricbombay.com
 										</a>
 									</div>
 								</div>
