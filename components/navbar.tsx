@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState, useEffect } from "react";
-import { Menu, X, AlertTriangle } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -37,7 +37,6 @@ export default function Navbar() {
 	};
 
 	const [glitchActive, setGlitchActive] = useState(false);
-	const [showWarning, setShowWarning] = useState(false);
 
 	// Randomly trigger glitch effect
 	useEffect(() => {
@@ -55,13 +54,9 @@ export default function Navbar() {
 		);
 
 		// Randomly show/hide warning
-		const warningInterval = setInterval(() => {
-			setShowWarning(Math.random() > 0.7);
-		}, 10000);
 
 		return () => {
 			clearInterval(glitchInterval);
-			clearInterval(warningInterval);
 		};
 	}, []);
 
@@ -173,23 +168,6 @@ export default function Navbar() {
 							/>
 						))}
 					</>
-				)}
-
-				{/* Warning message */}
-				{showWarning && (
-					<motion.div
-						className="absolute top-16 left-0 right-0 bg-yellow-400/10 border-y border-yellow-400/30 py-1 z-40 overflow-hidden"
-						initial={{ opacity: 0, y: -20 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -20 }}
-					>
-						<div className="container mx-auto px-4 flex items-center justify-center text-xs text-yellow-400 font-mono">
-							<AlertTriangle className="h-3 w-3 mr-2" />
-							<span className="uppercase tracking-wider">
-								UNAUTHORIZED ACCESS DETECTED
-							</span>
-						</div>
-					</motion.div>
 				)}
 			</header>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { MapPin, AlertTriangle, Headphones, ExternalLink } from "lucide-react";
+import { MapPin, Headphones, ExternalLink } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { AdvancedImage } from "@cloudinary/react";
 import { cloudinary } from "@/lib/cloudinary";
@@ -17,7 +17,6 @@ export default function AboutSection() {
 	});
 
 	const imageOpacity = useTransform(scrollYProgress, [0, 0.5], [0.5, 1]);
-	const [showWarning, setShowWarning] = useState(false);
 	const [glitchActive, setGlitchActive] = useState(false);
 	// Attach the ref to a container <div> that wraps the AdvancedImage.
 	const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -29,15 +28,6 @@ export default function AboutSection() {
 		.quality("auto")
 		.resize(auto().gravity(autoGravity()).width(500).height(500)); // Transform the image: auto-crop to square aspect_ratio
 	image.effect(grayscale()); // Apply grayscale effect (optional)
-
-	// Randomly show/hide warning
-	useEffect(() => {
-		const interval = setInterval(() => {
-			setShowWarning(Math.random() > 0.7);
-		}, 5000);
-
-		return () => clearInterval(interval);
-	}, []);
 
 	// Randomly trigger glitch effect
 	useEffect(() => {
@@ -232,20 +222,6 @@ export default function AboutSection() {
 
 						{/* Torn corner effect */}
 						<div className="absolute -bottom-2 -right-2 w-12 h-12 bg-black transform rotate-45 translate-x-3 translate-y-3"></div>
-
-						{/* Warning label */}
-						{showWarning && (
-							<motion.div
-								className="absolute -top-2 -left-2 bg-yellow-400 text-black text-xs font-bold py-1 px-2 flex items-center"
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								exit={{ opacity: 0 }}
-								transition={{ duration: 0.3 }}
-							>
-								<AlertTriangle className="h-3 w-3 mr-1" />{" "}
-								EXPLICIT CONTENT
-							</motion.div>
-						)}
 					</motion.div>
 
 					<motion.div
