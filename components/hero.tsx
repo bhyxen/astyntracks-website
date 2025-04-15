@@ -1,13 +1,6 @@
 "use client";
 
-import {
-	Suspense,
-	useRef,
-	useEffect,
-	useState,
-	useCallback,
-	useMemo,
-} from "react";
+import { Suspense, useRef, useEffect, useState, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, Sparkles } from "@react-three/drei";
 import LogoModel from "./logo-model";
@@ -15,47 +8,6 @@ import { ArrowDown } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import CustomButton from "./customButton";
 import * as THREE from "three";
-
-const GlitchBlock = ({ glitchActive }: { glitchActive: boolean }) => {
-	const randomValues = useMemo(
-		() =>
-			Array.from({ length: 8 }).map(() => ({
-				width: Math.random() * 100 + 20,
-				height: Math.random() * 30 + 5,
-				left: Math.random() * 100,
-				top: Math.random() * 100,
-			})),
-		[],
-	);
-
-	return (
-		<>
-			{randomValues.map((value, i) => (
-				<motion.div
-					key={`glitch-block-${i}`}
-					className="absolute bg-yellow-400/30"
-					style={{
-						width: `${value.width}px`,
-						height: `${value.height}px`,
-						left: `${value.left}%`,
-						top: `${value.top}%`,
-						mixBlendMode: "exclusion",
-					}}
-					initial={{ opacity: 0 }}
-					animate={
-						glitchActive
-							? {
-									opacity: [0, 0.8, 0],
-									x: [0, Math.random() * 20 - 10, 0],
-								}
-							: { opacity: 0 }
-					}
-					transition={{ duration: 0.2 }}
-				/>
-			))}
-		</>
-	);
-};
 
 const DataCorruptionEffect = () => {
 	const randomValues = useMemo(
