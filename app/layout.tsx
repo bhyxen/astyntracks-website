@@ -56,7 +56,7 @@ export default function RootLayout({
 			<head>
 				<link rel="canonical" href="https://www.astyntracks.com" />
 			</head>
-			<body className="min-h-screen bg-black">
+			<body className="min-h-screen bg-black scroll-smooth">
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="dark"
