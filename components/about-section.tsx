@@ -6,7 +6,7 @@ import { useRef, useState, useEffect } from "react";
 import { AdvancedImage } from "@cloudinary/react";
 import { cloudinary } from "@/lib/cloudinary";
 import { grayscale } from "@cloudinary/url-gen/actions/effect";
-import { auto } from "@cloudinary/url-gen/actions/resize";
+import { auto, fill, limitFill } from "@cloudinary/url-gen/actions/resize";
 import { autoGravity } from "@cloudinary/url-gen/qualifiers/gravity";
 
 export default function AboutSection() {
@@ -23,10 +23,10 @@ export default function AboutSection() {
 
 	// Define the image
 	const image = cloudinary
-		.image("astyn-profile_azdu7n")
+		.image("astyn-6_rfyyzh")
 		.format("auto") // Optimize delivery by resizing and applying auto-format and auto-quality
 		.quality("auto")
-		.resize(auto().gravity(autoGravity()).width(500).height(500)); // Transform the image: auto-crop to square aspect_ratio
+		.resize(fill().gravity(autoGravity()).width(544).height(725)); // Transform the image: auto-crop to 3:4 aspect ratio
 	image.effect(grayscale()); // Apply grayscale effect (optional)
 
 	// Randomly trigger glitch effect
@@ -186,13 +186,16 @@ export default function AboutSection() {
 						whileInView={{ opacity: 1, x: 0 }}
 						viewport={{ once: true }}
 						transition={{ duration: 0.5 }}
-						className="relative"
+						className="relative aspect-[3/4]"
 						style={{ opacity: imageOpacity }}
 					>
-						<div className="relative" ref={imageContainerRef}>
+						<div
+							className="relative aspect-[3/4]"
+							ref={imageContainerRef}
+						>
 							<AdvancedImage
 								cldImg={image}
-								className="w-full filter grayscale hover:grayscale-0 transition-all duration-500 border border-yellow-400"
+								className="border-none w-full filter grayscale hover:grayscale-0 transition-all duration-500 border border-yellow-400"
 								alt="ASTYN"
 							/>
 							{/* Glitch effect overlay */}
