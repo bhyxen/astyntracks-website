@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 // ✅ Preferred way to define metadata in Next.js 15.2.4
 export function generateMetadata(): Metadata {
@@ -65,6 +66,7 @@ export default function RootLayout({
 					<main>{children}</main>
 					<Toaster closeButton />
 				</ThemeProvider>
+				<Analytics />
 			</body>
 		</html>
 	);
