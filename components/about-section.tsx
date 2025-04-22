@@ -6,7 +6,7 @@ import { useRef, useState, useEffect } from "react";
 import { AdvancedImage } from "@cloudinary/react";
 import { cloudinary } from "@/lib/cloudinary";
 import { grayscale } from "@cloudinary/url-gen/actions/effect";
-import { auto, fill, limitFill } from "@cloudinary/url-gen/actions/resize";
+import { fill } from "@cloudinary/url-gen/actions/resize";
 import { autoGravity } from "@cloudinary/url-gen/qualifiers/gravity";
 
 export default function AboutSection() {
