@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
 			allow: "/",
 			disallow: "/private/",
 		},
-		sitemap: "https://www.astyntracks.com/sitemap.xml",
+		sitemap: "https://www.astynmusic.com/sitemap.xml",
 	};
 }

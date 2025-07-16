@@ -15,7 +15,7 @@ export const sendMessage = async ({ name, email, message }: emailDetails) => {
 		resend.emails.send({
 			from: process.env.EMAIL_FROM as string,
 			to: "astyntracks@gmail.com",
-			subject: "NEW MESSAGE FROM WEBSITE (https://www.astyntracks.com)",
+			subject: "NEW MESSAGE FROM WEBSITE (https://www.astynmusic.com)",
 			html: htmlEmailTemplate({
 				name: name,
 				email: email,
